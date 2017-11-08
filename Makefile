@@ -4,7 +4,6 @@ export GOPATH := $(CURDIR)/_vendor
 all: build
 
 patch:
-	rm -rf data
 	rm -rf _vendor/src/github.com/elastic/beats/libbeat/processors/actions/parse
 	ln -s ../../../../../../../../parse _vendor/src/github.com/elastic/beats/libbeat/processors/actions/parse
 	cp inject_parse.go _vendor/src/github.com/elastic/beats/libbeat/processors/actions/inject_parse.go
@@ -18,6 +17,7 @@ build: patch
 	go build github.com/elastic/beats/filebeat
 
 run: build
+	rm -rf data
 	./filebeat -c sample.yaml
 
 test:
