@@ -5,6 +5,7 @@ import (
 	"strings"
 	"sync"
 
+	"github.com/elastic/beats/libbeat/beat"
 	"github.com/elastic/beats/libbeat/common"
 	"github.com/elastic/beats/libbeat/logp"
 	"github.com/elastic/beats/libbeat/processors"
@@ -42,7 +43,7 @@ func init() {
 var DropEvent = errors.New("DropEvent")
 var ParseError = errors.New("parse error")
 
-func NewParse(c common.Config) (processors.Processor, error) {
+func NewParse(c *common.Config) (processors.Processor, error) {
 	config := ParseDefaultConfig
 
 	err := c.Unpack(&config)
@@ -60,7 +61,7 @@ func NewParse(c common.Config) (processors.Processor, error) {
 	return f, nil
 }
 
-func (f Parse) Run(event common.MapStr) (common.MapStr, error) {
+func (f Parse) Run(event *beat.Event) (*beat.Event, error) {
 	var errs []string
 
 	parserObj, err := event.GetValue(f.Field)
@@ -123,15 +124,15 @@ func (f Parse) Run(event common.MapStr) (common.MapStr, error) {
 		}
 	}
 
-	err = handler(text, event)
+	err = handler(text, event.Fields)
 
 	if err != nil {
 		if err == DropEvent {
 			return nil, nil
 		}
 
-		event["parse_error"] = err.Error()
-		event["message"] = text
+		event.Fields["parse_error"] = err.Error()
+		event.Fields["message"] = text
 	}
 
 	if len(errs) > 0 {

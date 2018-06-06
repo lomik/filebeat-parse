@@ -47,9 +47,9 @@ output (sent to logstash):
 # enable parse processor
 processors:
 - parse:
-  # define field which store log format (parser)
-  # events without this field are skipped by parse processor
-  field: "parse"
+    # define field which store log format (parser)
+    # events without this field are skipped by parse processor
+    field: "parse"
 
 # define inputs with "parse" extra field
 filebeat.prospectors:
